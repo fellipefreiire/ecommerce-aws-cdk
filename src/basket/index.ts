@@ -1,28 +1,33 @@
 import { APIGatewayEvent } from 'aws-lambda'
+import { checkoutBasket } from './checkoutBasket'
+import { createBasket } from './createBasket'
+import { deleteBasket } from './deleteBasket'
+import { getAllBaskets } from './getAllBaskets'
+import { getBasket } from './getBasket'
 
 export const handler = async (
   event: APIGatewayEvent
 ) => {
   try {
+
     let body
     switch (event.httpMethod) {
       case 'GET':
-        if (event.queryStringParameters !== null) {
-          // body = await getProductsByCategory(event) // Get product/1234?category=Phone
-        } else if (event.pathParameters !== null) {
-          // body = await getProduct(event.pathParameters.id) // GET product/{id}
+        if (event.pathParameters !== null) {
+          body = await getBasket(event.pathParameters.userName) // GET basket/{userName}
         } else {
-          // body = await getAllProducts() // GET product
+          body = await getAllBaskets() // GET /basket
         }
         break;
       case 'POST':
-        // body = await createProduct(event) // POST /product
+        if (event.path == '/basket/checkout') {
+          body = await checkoutBasket(event) // POST /basket/checkout
+        } else {
+          body = await createBasket(event) // POST /basket
+        }
         break;
       case 'DELETE':
-        // body = await deleteProduct(event.pathParameters!.id) // DELETE /product/{id}
-        break;
-      case 'PUT':
-        // body = await updateProduct(event) // PUT /product/{id}
+        body = await deleteBasket(event.pathParameters!.userName) // DELETE /basket/{userName}
         break;
       default:
         throw new Error(`Unsupported route: "${event.httpMethod}"`)

@@ -7,11 +7,13 @@ import { join } from 'path';
 interface EcommerceMicroservicesProps {
   productTable: ITable
   basketTable: ITable
+  orderTable: ITable
 }
 
 export class EcommerceMicroservices extends Construct {
   public readonly productMicroservice: NodejsFunction
   public readonly basketMicroservice: NodejsFunction
+  public readonly orderingMicroservice: NodejsFunction
 
   constructor(
     scope: Construct,
@@ -24,6 +26,8 @@ export class EcommerceMicroservices extends Construct {
     this.productMicroservice = this.createProductFunction(props.productTable)
     //basket microservice
     this.basketMicroservice = this.createBasketFunction(props.basketTable)
+    //order microservice
+    this.orderingMicroservice = this.createOrderingMicroservice(props.orderTable)
   }
 
   private createProductFunction(productTable: ITable): NodejsFunction {
@@ -74,5 +78,31 @@ export class EcommerceMicroservices extends Construct {
     basketTable.grantReadWriteData(basketFunction)
 
     return basketFunction
+  }
+
+  private createOrderingMicroservice(orderTable: ITable): NodejsFunction {
+    const orderingFunctionProps: NodejsFunctionProps = {
+      bundling: {
+        externalModules: [
+          'aws-sdk'
+        ],
+        minify: true,
+      },
+      environment: {
+        PRIMARY_KEY: 'userName',
+        SORT_KEY: 'orderDate',
+        DYNAMODB_TABLE_NAME: orderTable.tableName
+      },
+      runtime: lambda.Runtime.NODEJS_16_X
+    }
+
+    const orderingFunction = new NodejsFunction(this, 'orderingLambdaFunction', {
+      entry: join(__dirname, `/../src/ordering/index.ts`),
+      ...orderingFunctionProps,
+    })
+
+    orderTable.grantReadWriteData(orderingFunction)
+
+    return orderingFunction
   }
 }

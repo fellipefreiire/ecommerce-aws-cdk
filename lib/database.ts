@@ -6,12 +6,14 @@ import { ITable } from 'aws-cdk-lib/aws-dynamodb';
 export class EcommerceDatabase extends Construct {
   public readonly productTable: dynamodb.ITable
   public readonly basketTable: dynamodb.ITable
+  public readonly orderTable: dynamodb.ITable
 
   constructor(scope: Construct, id: string) {
     super(scope, id)
 
     this.productTable = this.createProductTable() //product table
     this.basketTable = this.createBasketTable() //basket table
+    this.orderTable = this.createOrderTable() //basket table
   }
 
   private createProductTable(): ITable {
@@ -37,5 +39,23 @@ export class EcommerceDatabase extends Construct {
     })
 
     return basketTable
+  }
+
+  private createOrderTable(): ITable {
+    const orderTable = new dynamodb.Table(this, 'order', {
+      partitionKey: {
+        name: 'userName',
+        type: dynamodb.AttributeType.STRING
+      },
+      sortKey: {
+        name: 'orderDate',
+        type: dynamodb.AttributeType.STRING
+      },
+      tableName: 'order',
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    })
+
+    return orderTable
   }
 }
