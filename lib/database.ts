@@ -1,6 +1,7 @@
 import { Construct } from 'constructs';
 import * as cdk from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import { ITable } from 'aws-cdk-lib/aws-dynamodb';
 
 export class EcommerceDatabase extends Construct {
   public readonly productTable: dynamodb.ITable
@@ -9,7 +10,11 @@ export class EcommerceDatabase extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id)
 
-    // Product DynamoDb Table Creation
+    this.productTable = this.createProductTable() //product table
+    this.basketTable = this.createBasketTable() //basket table
+  }
+
+  private createProductTable(): ITable {
     const productTable = new dynamodb.Table(this, 'product', {
       partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
       tableName: 'product',
@@ -17,15 +22,20 @@ export class EcommerceDatabase extends Construct {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
     })
 
-    // Basket DynamoDb Table Creation
+    return productTable
+  }
+
+  private createBasketTable(): ITable {
     const basketTable = new dynamodb.Table(this, 'basket', {
-      partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
+      partitionKey: {
+        name: 'userName',
+        type: dynamodb.AttributeType.STRING
+      },
       tableName: 'basket',
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
     })
 
-    this.productTable = productTable
-    this.basketTable = basketTable
+    return basketTable
   }
 }

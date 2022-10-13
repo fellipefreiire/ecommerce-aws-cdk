@@ -1,10 +1,4 @@
 import { APIGatewayEvent } from 'aws-lambda'
-import { getProduct } from './getProduct'
-import { getAllProducts } from './getAllProducts'
-import { createProduct } from './createProduct'
-import { deleteProduct } from './deleteProduct'
-import { updateProduct } from './updateProduct'
-import { getProductsByCategory } from './getProductsByCategory'
 
 export const handler = async (
   event: APIGatewayEvent
@@ -14,21 +8,21 @@ export const handler = async (
     switch (event.httpMethod) {
       case 'GET':
         if (event.queryStringParameters !== null) {
-          body = await getProductsByCategory(event) // Get product/1234?category=Phone
+          // body = await getProductsByCategory(event) // Get product/1234?category=Phone
         } else if (event.pathParameters !== null) {
-          body = await getProduct(event.pathParameters.id) // GET product/{id}
+          // body = await getProduct(event.pathParameters.id) // GET product/{id}
         } else {
-          body = await getAllProducts() // GET product
+          // body = await getAllProducts() // GET product
         }
         break;
       case 'POST':
-        body = await createProduct(event) // POST /product
+        // body = await createProduct(event) // POST /product
         break;
       case 'DELETE':
-        body = await deleteProduct(event.pathParameters!.id) // DELETE /product/{id}
+        // body = await deleteProduct(event.pathParameters!.id) // DELETE /product/{id}
         break;
       case 'PUT':
-        body = await updateProduct(event) // PUT /product/{id}
+        // body = await updateProduct(event) // PUT /product/{id}
         break;
       default:
         throw new Error(`Unsupported route: "${event.httpMethod}"`)

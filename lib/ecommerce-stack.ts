@@ -11,11 +11,13 @@ export class EcommerceStack extends cdk.Stack {
     const database = new EcommerceDatabase(this, 'Database')
 
     const microservices = new EcommerceMicroservices(this, 'Microservices', {
-      productTable: database.productTable
+      productTable: database.productTable,
+      basketTable: database.basketTable,
     })
 
     const apiGateway = new EcommerceApiGateway(this, 'ApiGateway', {
-      productMicroservice: microservices.productMicroservice
+      productMicroservice: microservices.productMicroservice,
+      basketMicroservice: microservices.basketMicroservice,
     })
   }
 }
