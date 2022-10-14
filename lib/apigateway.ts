@@ -5,6 +5,7 @@ import { IFunction } from "aws-cdk-lib/aws-lambda";
 interface EcommerceApiGatewayProps {
   productMicroservice: IFunction
   basketMicroservice: IFunction
+  orderingMicroservice: IFunction
 }
 
 export class EcommerceApiGateway extends Construct {
@@ -17,9 +18,10 @@ export class EcommerceApiGateway extends Construct {
 
     this.createProductApi(props.productMicroservice) // Product api gateway
     this.createBasketApi(props.basketMicroservice) // Basket api gateway
+    this.createOrderApi(props.orderingMicroservice)
   }
 
-  createProductApi(productMicroservice: IFunction) {
+  private createProductApi(productMicroservice: IFunction) {
     // Product microservice api gateway
 
     // root name = product
@@ -47,7 +49,7 @@ export class EcommerceApiGateway extends Construct {
     singleProduct.addMethod('DELETE') // DELETE /product/{id}
   }
 
-  createBasketApi(basketMicroservice: IFunction) {
+  private createBasketApi(basketMicroservice: IFunction) {
     // Basket microservice api gateway
     // root name = basket
 
@@ -78,5 +80,29 @@ export class EcommerceApiGateway extends Construct {
     const basketCheckout = basket.addResource('checkout')
     basketCheckout.addMethod('POST') // POST /basket/checkout
     // expected request payload: { username: swn }
+  }
+
+  private createOrderApi(orderingMicroservice: IFunction) {
+    // Ordering microservices api gateway
+    // root name = order
+
+    // GET /order
+    // GET /order/{userName}
+    // expected request : xxx/order/ecommerce?orderDate=timestamp
+    // ordering ms grap input and query parameters and filter to dynamo db
+
+    const orderAgw = new apigateway.LambdaRestApi(this, 'orderApi', {
+      restApiName: 'Order Serivce',
+      handler: orderingMicroservice,
+      proxy: false
+    })
+
+    const order = orderAgw.root.addResource('order')
+    order.addMethod('GET') // GET /order
+
+    const singleOrder = order.addResource('{username}')
+    singleOrder.addMethod('GET') // GET /order/{userName}
+    // expected request : xxx/order/ecommerce?orderDate=timestamp
+    // ordering ms grap input and query parameters and filter to dynamo db
   }
 }

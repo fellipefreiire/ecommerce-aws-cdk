@@ -21,7 +21,7 @@ export class EcommerceEventBus extends Construct {
       enabled: true,
       description: 'When Basket microservice checkout the basket',
       eventPattern: {
-        source: ['com.ecommerce.basket.checkout'],
+        source: ['com.ecommerce.basket.checkoutbasket'],
         detailType: ['CheckoutBasket']
       },
       ruleName: 'CheckoutBasketRule'
