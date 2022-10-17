@@ -65,7 +65,10 @@ export class EcommerceMicroservices extends Construct {
       },
       environment: {
         PRIMARY_KEY: 'userName',
-        DYNAMODB_TABLE_NAME: basketTable.tableName
+        DYNAMODB_TABLE_NAME: basketTable.tableName,
+        EVENT_SOURCE: 'com.ecommerce.basket.checkoutbasket',
+        EVENT_DETAIL_TYPE: 'CheckoutBasket',
+        EVENT_BUS_NAME: "EcommerceEventBus"
       },
       runtime: lambda.Runtime.NODEJS_16_X
     }

@@ -1,10 +1,10 @@
+import { EcommerceQueue } from './queue';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { EcommerceDatabase } from './database';
 import { EcommerceApiGateway } from './apigateway';
 import { EcommerceMicroservices } from './microservice';
 import { EcommerceEventBus } from './eventbus';
-
 
 export class EcommerceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -24,9 +24,13 @@ export class EcommerceStack extends cdk.Stack {
       orderingMicroservice: microservices.orderingMicroservice
     })
 
+    const queue = new EcommerceQueue(this, 'Queue', {
+      consumer: microservices.orderingMicroservice,
+    })
+
     const eventBus = new EcommerceEventBus(this, 'EventBus', {
       publisherFunction: microservices.basketMicroservice,
-      targetFunction: microservices.orderingMicroservice,
+      targetQueue: queue.orderQueue,
     })
   }
 }

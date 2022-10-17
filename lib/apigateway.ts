@@ -100,7 +100,7 @@ export class EcommerceApiGateway extends Construct {
     const order = orderAgw.root.addResource('order')
     order.addMethod('GET') // GET /order
 
-    const singleOrder = order.addResource('{username}')
+    const singleOrder = order.addResource('{userName}')
     singleOrder.addMethod('GET') // GET /order/{userName}
     // expected request : xxx/order/ecommerce?orderDate=timestamp
     // ordering ms grap input and query parameters and filter to dynamo db
